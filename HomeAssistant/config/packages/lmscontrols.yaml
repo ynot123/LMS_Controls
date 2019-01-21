@@ -1,5 +1,6 @@
 ###  LMS Controls Package - GoogleHome / Assistant Voice Control of Logitech Media Server
 ###
+###  Rev 6: January 21,  2019 - Fixed some duplicate alias'
 ###  Rev 5: January 11,  2018 - Implemented more error checking in shell files when empty query results are returned, don't queue bad results
 ###                           - Updated query speech feedback for empty query results
 ###                           - Added shell file for LMS playlists and artists for consistency and flexibility
@@ -148,7 +149,7 @@ input_select:
     icon: mdi:run-fast
 
 ###  To be updated as required
-###   - Update options for the music sources you have available
+###   - Update options for the music sources you have availble
 ###   - At this time only lms and spotify are supported
   lms_source:
     name: Music Source
@@ -776,7 +777,7 @@ automation:
         entity_id: script.lms_cmd_start_player
 
 # LMS GUI Master Sync Controls 
-  - alias: "LMS GUI Add Song Command"
+  - alias: "LMS GUI Master Sync Command OFF"
     initial_state: true
     trigger:
     - platform: state
@@ -1240,7 +1241,7 @@ script:
             parameters: ["cmd:add","artist_id:{{states.sensor.art_id.state}}"]
 
     lms_cmd_add_artist_spot:
-      alias:  "LMS command to add LMS artist to the queue"
+      alias:  "LMS command to add Spotify artist to the queue"
       sequence:
         - service: shell_command.lms_spot_art
           data_template:
@@ -1299,7 +1300,7 @@ script:
             parameters: ["cmd:add","album_id:{{states.sensor.alb_id.state}}"]
             
     lms_cmd_add_album_spot:
-      alias:  "LMS command to add LMS album to the queue"
+      alias:  "LMS command to add Spotify album to the queue"
       sequence:
         - service: shell_command.lms_spot_art_alb
           data_template:
@@ -1415,6 +1416,7 @@ group:
         - group.lms_sync_players
         - group.all_lms_players
 
+
   lms_player:
     name: LMS Music Player Controls
     control: hidden
@@ -1438,7 +1440,7 @@ group:
     name: List of Sync Players
     entities:
 ###  To be updated as required
-###       add or remove comments to enable up to 10 players
+###       add or remove comments to enable upto 10 players
     - input_select.lms_sync_master
     - input_boolean.lms_player1_sync
     - input_boolean.lms_player2_sync
