@@ -1,0 +1,71 @@
+  - title: LMS Controls
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: entities
+            title: LMS Player Controls
+            show_header_toggle: false
+            entities:
+              - input_select.lms_player
+              - input_select.lms_source
+              - input_text.lms_artist
+              - input_text.lms_album
+              - input_text.lms_song
+              - input_text.lms_playlist
+              - input_select.lms_command
+          - type: glance
+            column_width: 33%
+            show_state: false
+            entities:
+              - entity: script.lms_cmd_pause_player
+                tap_action:
+                  action: toggle
+                name: Pause
+              - entity: script.lms_cmd_start_player
+                tap_action:
+                  action: toggle
+                name: Play
+              - entity: script.lms_cmd_next_track
+                tap_action:
+                  action: toggle
+                name: Next Track
+          - type: glance
+            column_width: 25%
+            show_state: true
+            entities:
+              - input_number.lms_volume
+              - input_number.lms_sleep_time
+              - entity: input_boolean.lms_shuffle
+                tap_action:
+                  action: toggle
+              - entity: input_boolean.lms_repeat
+                tap_action:
+                  action: toggle
+      - type: entities
+        title: LMS Sync Controls
+        show_header_toggle: true
+        entities:
+          - input_select.lms_sync_master
+          - input_boolean.lms_player1_sync
+          - input_boolean.lms_player2_sync
+          - input_boolean.lms_player3_sync
+          - input_boolean.lms_player4_sync
+          - input_boolean.lms_player5_sync
+          - type: divider
+          - input_text.lms_qry_result
+          - type: divider
+          - icon: 'mdi:cloud-check'
+            name: LMS Controls - GitHub
+            type: weblink
+            url: 'https://github.com/ynot123/LMS_Controls'
+      - type: glance
+        title: Media Player Status
+        column_width: 25%
+        entities:
+          - media_player.mediaroom
+          - media_player.kitchen
+          - media_player.garage
+          - media_player.googlehome
+          - media_player.googlemini_1
+          - media_player.googlemini_2
+          - media_player.familyroom

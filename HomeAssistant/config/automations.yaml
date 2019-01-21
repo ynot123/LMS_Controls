@@ -1,0 +1,7 @@
+###  automations.yaml file not allowed to be empty when using package files
+###      - if your file is empty add this dummy automation to allow it to compile properly.
+    - alias: 'dummy'
+      hide_entity: true
+      initial_state: false
+      trigger:
+      action:

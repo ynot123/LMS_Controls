@@ -1,0 +1,34 @@
+###  LMS Controls - Enable Voice control of LMS Server from GoogleHome / Assistant
+###
+###     - Add or ensure the following entries in your configuration.yaml file
+
+homeassistant:
+  ### The following installs all package files
+  packages: !include_dir_named packages
+
+recorder:
+  exclude:
+    domains:
+    - script
+    - automation
+ 
+logger:
+  default: critical
+###  Enable the logs below if you need to debug the application
+#  logs:
+#    homeassistant.components.shell_command: debug
+#    homeassistant.components.intent_script: debug
+#    homeassistant.components.dialogflow: debug
+#    homeassistant.components.media_player.squeezebox: debug
+
+media_player:
+  - platform: squeezebox
+##  Set your IP address for LMS server
+    host: your_lms_ip_address
+## Remove comment and set username and password for "secured" LMS installations
+#    username: your_username
+#    password: your_password
+
+dialogflow:
+intent_script: 
+

@@ -1,0 +1,1471 @@
+###  LMS Controls Package - GoogleHome / Assistant Voice Control of Logitech Media Server
+###
+###  Rev 5: January 11,  2018 - Implemented more error checking in shell files when empty query results are returned, don't queue bad results
+###                           - Updated query speech feedback for empty query results
+###                           - Added shell file for LMS playlists and artists for consistency and flexibility
+###                           - Added periodic update timer (60s) to update current player status, volume, shuffle, etc..
+###  Rev 4: December 30, 2018 - Removed any contractions (it's changes to its) for values returned by google intent or entered in the GUI
+###                           - Updated up to 10 players allowed for synchromyzation
+###  Rev 3: December 18, 2018 - Created the lmscontrols.yaml package file moving original inputs, settings, 
+###                             scripts and intents and automations into package format
+###  Rev 2: December 17, 2018 - Added feedback intents qry_result_intent, whats_playing_intent, player_status_intent
+###  Rev 1: December 06, 2018 - Inital intent.yaml development
+###  Rev 0: November 23, 2018 - Added automation triggers and shell script for lms volume, sleep timer, shuffle, repeat status 
+###                             when current player name changes or on startup.  Ensures HA GUI values are synced with lms server 
+###
+###  NOTE:  All sections marked with:    ###  To be updated as required
+###         are to be reviewed and updated to suit your installation
+homeassistant:
+  customize:
+    script.lms_cmd_next_track:
+      icon: mdi:skip-next
+    script.lms_cmd_pause_player:
+      icon: mdi:pause
+    script.lms_cmd_start_player:
+      icon: mdi:play
+###  To be updated as required
+###   - Update the list of media_players including:  media_player.xxxxxx, name: (friendly name) 
+###                                                  and player_id: (mac address of player from lms)
+### 
+    media_player.familyroom:
+      name: Family Room
+      playerid: bb:bb:db:xx:xx:xx
+      sync_stat: false
+    media_player.garage:
+      name: Garage
+      playerid: b8:27:eb:xx:xx:xx
+      sync_stat: false
+    media_player.googlehome:
+      name: Google Home
+      playerid: cc:cc:98:xx:xx:xx
+      sync_stat: false
+    media_player.googlemini_1:
+      name: Google Mini 1
+      playerid: cc:cc:85:xx:xx:xx
+      sync_stat: false
+    media_player.googlemini_2:
+      name: Google Mini 2
+      playerid: cc:cc:d0:xx:xx:xx
+      sync_stat: false
+    media_player.kitchen:
+      name: Kitchen
+      playerid: bb:bb:4e:xx:xx:xx
+      sync_stat: false
+    media_player.masterbedroom:
+      name: Master Bedroom
+      playerid: cc:cc:d4:xx:xx:xx
+      sync_stat: false
+    media_player.mediaroom:
+      name: Media Room
+      playerid: ea:71:ac:xx:xx:xx
+      sync_stat: false  
+
+###  To be updated as required
+###   - Shell scripts that query LMS database or spotify and returns sensors values to HA with the results
+###   - If your absolute path to the shell scripts is different than that listed below, update it to reflect the proper path
+shell_command:
+  lms_qry_alb: 'bash /config/shell/qry_alb.sh {{text1}} {{text2}}'
+  lms_qry_alb_song: 'bash /config/shell/qry_alb_song.sh {{text1}} {{text2}} {{text3}}'
+  lms_qry_art: 'bash /config/shell/qry_art.sh {{text1}}'
+  lms_qry_playlist: 'bash /config/shell/qry_playlist.sh {{text1}}'
+  lms_spot_art: 'bash /config/shell/spot_art_top.sh {{text1}}'
+  lms_spot_art_alb: 'bash /config/shell/spot_art_alb.sh {{text1}} {{text2}}'
+  lms_spot_art_alb_song: 'bash /config/shell/spot_art_alb_song.sh {{text1}} {{text2}} {{text3}}'
+  lms_spot_playlist: 'bash /config/shell/spot_playlist.sh {{text1}}'
+  lms_qry_player_stat: 'bash /config/shell/qry_player_stat.sh {{text1}}'
+
+###  List of input_booleans for status / settings  
+input_boolean:
+  lms_shuffle:
+    name: Shuffle
+    icon: mdi:shuffle-variant
+  lms_repeat:
+    name: Repeat
+    icon: mdi:repeat
+###  To be updated as required
+###   - Upto 10 players can be defined for sync
+##    - Update name: must match the media_player."player name" defined in the customize section
+  lms_player1_sync:
+    name: mediaroom
+    icon: mdi:cast
+  lms_player2_sync:
+    name: kitchen
+    icon: mdi:cast
+  lms_player3_sync:
+    name: garage
+    icon: mdi:cast
+  lms_player4_sync:
+    name: familyroom
+    icon: mdi:cast
+  lms_player5_sync:
+    name: googlehome
+    icon: mdi:cast
+  lms_player6_sync:
+    name: googlemini_1
+    icon: mdi:cast
+  lms_player7_sync:
+    name: googlemini_2
+    icon: mdi:cast
+  lms_player8_sync:
+    name: unassigned
+    icon: mdi:cast
+  lms_player9_sync:
+    name: unassigned
+    icon: mdi:cast
+  lms_player10_sync:
+    name: unassigned
+    icon: mdi:cast
+
+###  List of input_numbers for volume / sleep timer
+input_number: 
+  lms_volume:
+    name: Volume
+    min: 0
+    max: 100 
+    step: 1
+    icon: mdi:volume-high
+  lms_sleep_time:
+    name: Sleep Timer
+    min: 0
+    max: 60
+    step: 1
+    icon: mdi:timer
+
+###  List of input_selections for various item selection like: player name, command, music source and master player for sync
+input_select:
+  lms_command:
+    name: LMS Command
+    options:
+      - __________________
+      - add album
+      - add artist
+      - add playlist
+      - add song
+      - play album
+      - play artist
+      - play playlist
+      - play song
+    icon: mdi:run-fast
+
+###  To be updated as required
+###   - Update options for the music sources you have available
+###   - At this time only lms and spotify are supported
+  lms_source:
+    name: Music Source
+    options:
+      - spotify
+      - lms
+    icon: mdi:library
+###  To be updated as required
+###   - Update options to reflect the media player names you have available as defined in customization section
+###   - At this time only lms and spotify are supported
+  lms_player:
+    name: Media Player Name
+    options:
+      - mediaroom
+      - kitchen
+      - garage
+      - familyroom
+      - googlehome
+      - googlemini_1
+      - googlemini_2
+    icon: mdi:cast-connected
+
+###  To be updated as required
+###   - Update options to reflect the media player names you have available as defined in customization section
+###   - At this time only lms and spotify are supported
+  lms_sync_master:
+    name: Master Player (Sync Source)
+    options:
+      - mediaroom
+      - kitchen
+      - garage
+      - familyroom
+      - googlehome
+      - googlemini_1
+      - googlemini_2
+    icon: mdi:cast-connected
+
+###  List of input_texts which hold values for LMS scripts like artist, album, song, playlist, Google intent command, 
+###  temporary values and the result of music source queries
+input_text: 
+  lms_artist:
+    name: Artist Name
+    initial: ""
+    icon: mdi:artist
+  lms_album:
+    name: Album Title
+    initial: ""
+    icon: mdi:album
+  lms_song:
+    name: Song
+    initial: ""
+    icon: mdi:itunes
+  lms_playlist:
+    name: Playlist
+    initial: ""
+    icon: mdi:playlist-play
+  lms_command_intent:
+    name: Google Intent LMS Command
+  lms_p1:
+    name: Parameter 1
+  lms_p2:
+    name: Parameter 2
+  lms_p3:
+    name: Parameter 3
+    max: 500
+  lms_qry_result:
+    name: Query Result
+    icon: mdi:eye
+  
+intent_script:
+###     Intent_scripts used for processing webhooks from DialogFlow (GoogleHome / Assistant)
+###     Rev. 0:     Dec 06, 2018 - Inital intent.yaml development
+###     Rev. 1:     Dec 17, 2018 - Added feedback intents qry_result_intent, whats_playing_intent, player_status_intent
+###
+###  lms_dialog_intent: - Logitech Media Server primary control script for use with Google Dialog Flow project "LMS Controls"
+###     - sets the variables from google dialog flow
+###     - calls up the proper Home Assistant LMS controls subscript based on intentName from google dialog flow project
+###
+  lms_dialog_intent:
+    action:
+    - service: input_text.set_value
+      data_template:
+        entity_id: input_text.lms_command_intent
+        value: "{{lms_command}}"
+# Set player
+    - service: input_text.set_value
+      data_template:
+        entity_id: input_text.lms_p3
+        value: "{{lms_player}}"
+    - service: input_select.select_option
+      data_template:
+        entity_id: input_select.lms_player
+        option: >
+            {% if (states.input_text.lms_p3.state == '') %} {{states.input_select.lms_player.state}}
+            {% else %} {{states.input_text.lms_p3.state}} {% endif %}
+# Set source (filter for empty)
+    - service: input_text.set_value
+      data_template:
+        entity_id: input_text.lms_p3
+        value: "{{lms_source}}"
+    - service: input_select.select_option
+      data_template:
+        entity_id: input_select.lms_source
+        option: >
+            {% if (states.input_text.lms_p3.state == '') %} {{states.input_select.lms_source.state}}
+            {% else %} {{states.input_text.lms_p3.state}} {% endif %}
+# Set shuffle
+    - service: input_text.set_value
+      data_template:
+        entity_id: input_text.lms_p3
+        value: "{{lms_shuffle}}"
+    - service_template: >
+             {% if ((states.input_text.lms_p3.state == '') and (states.input_boolean.lms_shuffle.state == "on")) %} input_boolean.turn_on
+             {% elif ((states.input_text.lms_p3.state == '') and (states.input_boolean.lms_shuffle.state == "off")) %} input_boolean.turn_off
+             {% elif (states.input_text.lms_p3.state == 'on') %} input_boolean.turn_on
+             {% elif (states.input_text.lms_p3.state == 'off') %} input_boolean.turn_off
+             {% endif %}
+      entity_id: input_boolean.lms_shuffle
+# Set Repeat
+    - service: input_text.set_value
+      data_template:
+        entity_id: input_text.lms_p3
+        value: "{{lms_repeat}}"
+    - service_template: >
+             {% if ((states.input_text.lms_p3.state == '') and (states.input_boolean.lms_repeat.state == "on")) %} input_boolean.turn_on
+             {% elif ((states.input_text.lms_p3.state == '') and (states.input_boolean.lms_repeat.state == "off")) %} input_boolean.turn_off
+             {% elif (states.input_text.lms_p3.state == 'on') %} input_boolean.turn_on
+             {% elif (states.input_text.lms_p3.state == 'off') %} input_boolean.turn_off
+             {% endif %}
+      entity_id: input_boolean.lms_repeat
+# Set artist
+    - service: input_text.set_value
+      data_template:
+        entity_id: input_text.lms_artist
+        value: "{{lms_artist}}"
+# Set album
+    - service: input_text.set_value
+      data_template:
+        entity_id: input_text.lms_album
+        value: "{{lms_album}}"
+# Set song
+    - service: input_text.set_value
+      data_template:
+        entity_id: input_text.lms_song
+        value: "{{lms_song}}"
+# Set playlist
+    - service: input_text.set_value
+      data_template:
+        entity_id: input_text.lms_playlist
+        value: "{{lms_playlist}}"
+# Set volume (filter for empty)
+    - service: input_text.set_value
+      data_template:
+        entity_id: input_text.lms_p3
+        value: "{{lms_volume}}"
+    - service: input_number.set_value
+      data_template:
+        entity_id: input_number.lms_volume
+        value: >
+            {% if (states.input_text.lms_p3.state == '') %} {{states.input_number.lms_volume.state}}
+            {% else %} {{states.input_text.lms_p3.state}} {% endif %}
+# Set sleep time (filter for empty)
+    - service: input_text.set_value
+      data_template:
+        entity_id: input_text.lms_p3
+        value: "{{lms_sleep_time}}"
+    - service: input_number.set_value
+      data_template:
+        entity_id: input_number.lms_sleep_time
+        value: >
+            {% if (states.input_text.lms_p3.state == '') %} {{states.input_number.lms_sleep_time.state}}
+            {% else %} {{states.input_text.lms_p3.state}} {% endif %}
+# Set Master Player
+    - service: input_text.set_value
+      data_template:
+        entity_id: input_text.lms_p3
+        value: "{{lms_master_player}}"
+    - service: input_select.select_option
+      data_template:
+        entity_id: input_select.lms_sync_master
+        option: >
+            {% if (states.input_text.lms_p3.state == '') %} {{states.input_select.lms_sync_master.state}}
+            {% else %} {{states.input_text.lms_p3.state}} {% endif %}
+# Set Sync Player - Uses input_text.lms_p1 so be sure to make this the last set command no to overwrite p1.
+    - service: input_text.set_value
+      data_template:
+        entity_id: input_text.lms_p1
+        value: "{{lms_sync_player}}"
+    - service: input_select.select_option
+      data_template:
+        entity_id: input_select.lms_sync_player
+        option: >
+            {% if (states.input_text.lms_p1.state == '') %} none
+            {% endif %}
+### check lms_command and call appropriate script
+    - service: script.turn_on
+      data_template:
+        entity_id: >-
+            {% if (lms_command == "next track") %}
+              script.lms_cmd_next_track
+            {% elif (lms_command == "pause player") %}
+              script.lms_cmd_pause_player
+            {% elif (lms_command == "start player") %}
+              script.lms_cmd_start_player
+            {% elif ((lms_command == "play song") and (states.input_select.lms_source.state == "lms")) %}
+              script.lms_cmd_play_song
+            {% elif ((lms_command == "play song") and (states.input_select.lms_source.state == "spotify")) %}
+              script.lms_cmd_play_song_spot  
+            {% elif ((lms_command == "play playlist") and (states.input_select.lms_source.state == "lms")) %}
+              script.lms_cmd_play_playlist
+            {% elif ((lms_command == "play playlist") and (states.input_select.lms_source.state == "spotify")) %}
+              script.lms_cmd_play_playlist_spot
+            {% elif ((lms_command == "play artist") and (states.input_select.lms_source.state == "lms")) %}
+              script.lms_cmd_play_artist
+            {% elif ((lms_command == "play artist") and (states.input_select.lms_source.state == "spotify")) %}
+              script.lms_cmd_play_artist_spot
+            {% elif ((lms_command == "play album") and (states.input_select.lms_source.state == "lms")) %}
+              script.lms_cmd_play_album
+            {% elif ((lms_command == "play album") and (states.input_select.lms_source.state == "spotify")) %}
+              script.lms_cmd_play_album_spot
+            {% elif ((lms_command == "add album") and (states.input_select.lms_source.state == "lms")) %}
+              script.lms_cmd_add_album
+            {% elif ((lms_command == "add album") and (states.input_select.lms_source.state == "spotify")) %}
+              script.lms_cmd_add_album_spot
+            {% elif ((lms_command == "add artist") and (states.input_select.lms_source.state == "lms")) %}
+              script.lms_cmd_add_artist
+            {% elif ((lms_command == "add artist") and (states.input_select.lms_source.state == "spotify")) %}
+              script.lms_cmd_add_artist_spot
+            {% elif ((lms_command == "add song") and (states.input_select.lms_source.state == "lms")) %}
+              script.lms_cmd_add_song
+            {% elif ((lms_command == "add song") and (states.input_select.lms_source.state == "spotify")) %}
+              script.lms_cmd_add_song_spot
+            {% elif ((lms_command == "add playlist") and (states.input_select.lms_source.state == "lms")) %}
+              script.lms_cmd_add_playlist
+            {% elif ((lms_command == "add playlist") and (states.input_select.lms_source.state == "spotify")) %}
+              script.lms_cmd_add_playlist_spot
+            {% elif (lms_command == "play radio") %}
+              script.lms_cmd_play_radio
+            {% elif (lms_command == "sync one") %}
+              script.lms_cmd_sync_one
+            {% elif (lms_command == "sync all") %}
+              script.lms_cmd_sync_all
+            {% elif (lms_command == "unsync one") %}
+              script.lms_cmd_unsync_one
+            {% elif (lms_command == "unsync all") %}
+              script.lms_cmd_unsync_all
+            {% else %}
+              script.lms_do_nothing
+            {% endif %}
+
+###  qry_result_intent: 
+###     - Provides follow-up feedback on the results of music queries for lms and spotify
+  qry_result_intent:
+    speech:
+      text: >
+        {%- if states.input_text.lms_qry_result.state != 'null' -%}
+            'OK, your {{states.input_text.lms_command_intent.state}} request returned {{states.input_text.lms_qry_result.state}} and I 
+             queued it up to the {{states.input_select.lms_player.state}} player with shuffle {{states.input_boolean.lms_shuffle.state}}'
+        {%- else -%}
+            'OK, your {{states.input_text.lms_command_intent.state}} request returned no match so I left the {{states.input_select.lms_player.state}}
+             player queue as is'
+        {% endif %}      
+
+###  whats_playing_intent: 
+###     - Queries LMS player and returns what's currently playing title, album and artist
+  whats_playing_intent:
+    action:
+      # Set player
+      - service: input_text.set_value
+        data_template:
+          entity_id: input_text.lms_p3
+          value: "{{lms_player}}"
+      - service: input_text.set_value
+        data_template:
+          entity_id: input_text.lms_p2
+          value: >
+            {% if (states.input_text.lms_p3.state == '') %} {{states.input_select.lms_player.state}}
+            {% else %} {{states.input_text.lms_p3.state}} {% endif %}
+    
+    speech:
+      text: 'Looks like, in the {{ state_attr("media_player." + states.input_text.lms_p2.state, "friendly_name")}},
+             its {{ state_attr("media_player." + states.input_text.lms_p2.state, "media_title")}}
+             by {{ state_attr("media_player." + states.input_text.lms_p2.state, "media_artist")}} 
+             from the album {{ state_attr("media_player." + states.input_text.lms_p2.state, "media_album_name")}}' 
+
+###  player_status_intent: 
+###         - Queries LMS player and returns what's currently playing or in the queue if pause including title, 
+###           album and artist as well as volume, shuffle and repeat status
+  player_status_intent:
+    action:
+      # Set player
+      - service: input_text.set_value
+        data_template:
+          entity_id: input_text.lms_p3
+          value: "{{lms_player}}"
+      - service: input_text.set_value
+        data_template:
+          entity_id: input_text.lms_p2
+          value: >
+            {% if (states.input_text.lms_p3.state == '') %} {{states.input_select.lms_player.state}}
+            {% else %} {{states.input_text.lms_p3.state}} {% endif %}
+      - service: shell_command.lms_qry_player_stat
+        data_template:
+          text1: >
+            {{state_attr("media_player." + states.input_text.lms_p2.state, "playerid")}}
+    speech:
+      text: 'The {{ state_attr("media_player." + states.input_text.lms_p2.state, "friendly_name")}} player is 
+             {{states("media_player." + states.input_text.lms_p2.state)}}, volume is {{ states.sensor.raw_volume.state | round(0)}}, 
+             shuffle is {{states.sensor.raw_shuffle.state}} and repeat is {{states.sensor.raw_repeat.state}}.  The current track in the 
+             queue is {{ state_attr("media_player." + states.input_text.lms_p2.state, "media_title")}}
+             by {{ state_attr("media_player." + states.input_text.lms_p2.state, "media_artist")}} from the album
+             {{ state_attr("media_player." + states.input_text.lms_p2.state, "media_album_name")}}'   
+      
+
+automation:
+# LMS GUI Sync Volume, Sleep timer, repeat and shuffle status - from LMS player
+#   This is called everytime the current player is changed
+  - alias: "LMS GUI Update Player Values"
+    initial_state: true
+    trigger:
+      - platform: state
+        entity_id: input_select.lms_player
+      - platform: time
+        minutes: '/1'
+        seconds: 00
+      - platform: homeassistant
+        event: start
+    action:
+    - service: shell_command.lms_qry_player_stat
+      data_template:
+        text1: >
+            {{state_attr("media_player." + states.input_select.lms_player.state, "playerid")}}
+    - service: input_number.set_value
+      data_template:
+        entity_id: input_number.lms_volume
+        value: '{{states.sensor.raw_volume.state}}'
+    - service: input_number.set_value
+      data_template:
+        entity_id: input_number.lms_sleep_time
+        value: '{{states.sensor.raw_sleep.state | multiply(0.0166667) | int}}'
+    - service_template: >-
+        {% if states.sensor.raw_shuffle.state == "Off" %}
+          input_boolean.turn_off
+        {% else %}
+          input_boolean.turn_on
+        {% endif %}
+      entity_id: input_boolean.lms_shuffle       
+    - service_template: >-
+        {% if states.sensor.raw_repeat.state == "Off" %}
+          input_boolean.turn_off
+        {% else %}
+          input_boolean.turn_on
+        {% endif %}
+      entity_id: input_boolean.lms_repeat       
+
+# LMS GUI Volume control
+  - alias: "LMS GUI Volume Control"
+    initial_state: true
+    trigger:
+    - platform: state
+      entity_id: input_number.lms_volume
+    action:
+    - service:  media_player.squeezebox_call_method
+      data_template:
+        entity_id: "media_player.{{states.input_select.lms_player.state}}"
+        command: "mixer"
+        parameters: ["volume", "{{states.input_number.lms_volume.state}}"]
+
+# LMS GUI Sleep Time control
+  - alias: "LMS GUI Sleep Timer Control"
+    initial_state: true
+    trigger:
+    - platform: state
+      entity_id: input_number.lms_sleep_time
+    action:
+    - service:  media_player.squeezebox_call_method
+      data_template:
+        entity_id: "media_player.{{states.input_select.lms_player.state}}"
+        command: "sleep"
+        parameters: ["{{states.input_number.lms_sleep_time.state|int * 60}}"]
+
+# LMS GUI Shuffle On / Off
+  - alias: "LMS GUI Shuffle Control"
+    initial_state: true
+    trigger:
+    - platform: state
+      entity_id: input_boolean.lms_shuffle
+    action:
+    - service:  media_player.shuffle_set
+      data_template:
+        entity_id: "media_player.{{states.input_select.lms_player.state}}"
+        shuffle: >
+            {% if (states.input_boolean.lms_shuffle.state == "on") %} true
+            {% else %} false {% endif %}
+
+# LMS GUI Repeat On / Off
+  - alias: "LMS GUI Repeat Control"
+    initial_state: true
+    trigger:
+    - platform: state
+      entity_id: input_boolean.lms_repeat
+    action:
+    - service: input_text.set_value
+      data_template:
+        entity_id: input_text.lms_p1
+        value:  >
+            {% if (states.input_boolean.lms_repeat.state == "on") %} 2
+            {% else %} 0 {% endif %}
+    - service:  media_player.squeezebox_call_method
+      data_template:
+        entity_id: "media_player.{{states.input_select.lms_player.state}}"
+        command: "playlist"
+        parameters: ["repeat", "{{states.input_text.lms_p1.state}}"]
+
+# LMS GUI Command for play playlist
+  - alias: "LMS GUI Play Playlist Command"
+    initial_state: true
+    trigger:
+    - platform: state
+      entity_id: input_select.lms_command
+      to: "play playlist"
+    action:
+    - service: script.turn_on
+      data_template:
+        entity_id: >-
+            {% if (states.input_select.lms_source.state == "lms") %}
+                script.lms_cmd_play_playlist
+            {% else %}
+                script.lms_cmd_play_playlist_spot
+            {% endif %}
+    - delay: 00:00:02
+    - service: input_select.select_option
+      data_template:
+        entity_id: input_select.lms_command
+        option: "__________________"
+
+# LMS GUI Command for add playlist
+  - alias: "LMS GUI Add Playlist Command"
+    initial_state: true
+    trigger:
+    - platform: state
+      entity_id: input_select.lms_command
+      to: "add playlist"
+    action:
+    - service: script.turn_on
+      data_template:
+        entity_id: >-
+            {% if (states.input_select.lms_source.state == "lms") %}
+                script.lms_cmd_add_playlist
+            {% else %}
+                script.lms_cmd_add_playlist_spot
+            {% endif %}          
+    - delay: 00:00:02
+    - service: input_select.select_option
+      data_template:
+        entity_id: input_select.lms_command
+        option: "__________________"
+
+# LMS GUI Command for play artist
+  - alias: "LMS GUI Play Artist Command"
+    initial_state: true
+    trigger:
+    - platform: state
+      entity_id: input_select.lms_command
+      to: "play artist"
+    action:
+    - service: script.turn_on
+      data_template:
+        entity_id: >-
+            {% if (states.input_select.lms_source.state == "lms") %}
+                script.lms_cmd_play_artist
+            {% else %}
+                script.lms_cmd_play_artist_spot
+            {% endif %}          
+    - delay: 00:00:02
+    - service: input_select.select_option
+      data_template:
+        entity_id: input_select.lms_command
+        option: "__________________"
+
+# LMS GUI Command for add artist
+  - alias: "LMS GUI Add Artist Command"
+    initial_state: true
+    trigger:
+    - platform: state
+      entity_id: input_select.lms_command
+      to: "add artist"
+    action:
+    - service: script.turn_on
+      data_template:
+        entity_id: >-
+            {% if (states.input_select.lms_source.state == "lms") %}
+                script.lms_cmd_add_artist
+            {% else %}
+                script.lms_cmd_add_artist_spot
+            {% endif %}          
+    - delay: 00:00:02
+    - service: input_select.select_option
+      data_template:
+        entity_id: input_select.lms_command
+        option: "__________________"
+
+# LMS GUI Command for play album
+  - alias: "LMS GUI Play Album Command"
+    initial_state: true
+    trigger:
+    - platform: state
+      entity_id: input_select.lms_command
+      to: "play album"
+    action:
+    - service: script.turn_on
+      data_template:
+        entity_id: >-
+            {% if (states.input_select.lms_source.state == "lms") %}
+                script.lms_cmd_play_album
+            {% else %}
+                script.lms_cmd_play_album_spot
+            {% endif %}          
+    - delay: 00:00:02
+    - service: input_select.select_option
+      data_template:
+        entity_id: input_select.lms_command
+        option: "__________________"
+
+# LMS GUI Command for add album
+  - alias: "LMS GUI Add Album Command"
+    initial_state: true
+    trigger:
+    - platform: state
+      entity_id: input_select.lms_command
+      to: "add album"
+    action:
+    - service: script.turn_on
+      data_template:
+        entity_id: >-
+            {% if (states.input_select.lms_source.state == "lms") %}
+                script.lms_cmd_add_album
+            {% else %}
+                script.lms_cmd_add_album_spot
+            {% endif %}          
+    - delay: 00:00:02
+    - service: input_select.select_option
+      data_template:
+        entity_id: input_select.lms_command
+        option: "__________________"
+
+# LMS GUI Command for play song
+  - alias: "LMS GUI Play Song Command"
+    initial_state: true
+    trigger:
+    - platform: state
+      entity_id: input_select.lms_command
+      to: "play song"
+    action:
+    - service: script.turn_on
+      data_template:
+        entity_id: >-
+            {% if (states.input_select.lms_source.state == "lms") %}
+                script.lms_cmd_play_song
+            {% else %}
+                script.lms_cmd_play_song_spot
+            {% endif %}          
+    - delay: 00:00:02
+    - service: input_select.select_option
+      data_template:
+        entity_id: input_select.lms_command
+        option: "__________________"
+
+# LMS GUI Command for add song
+  - alias: "LMS GUI Add Song Command"
+    initial_state: true
+    trigger:
+    - platform: state
+      entity_id: input_select.lms_command
+      to: "add song"
+    action:
+    - service: script.turn_on
+      data_template:
+        entity_id: >-
+            {% if (states.input_select.lms_source.state == "lms") %}
+                script.lms_cmd_add_song
+            {% else %}
+                script.lms_cmd_add_song_spot
+            {% endif %}          
+    - delay: 00:00:02
+    - service: input_select.select_option
+      data_template:
+        entity_id: input_select.lms_command
+        option: "__________________"
+
+# LMS GUI Command for next track
+  - alias: "LMS GUI Next Track Command"
+    initial_state: true
+    trigger:
+    - platform: state
+      entity_id: input_select.lms_command
+      to: "next track"
+    action:
+    - service: script.turn_on
+      data_template:
+        entity_id: script.lms_cmd_next_track
+
+# LMS GUI Command for pause player
+  - alias: "LMS GUI Pause Player Command"
+    initial_state: true
+    trigger:
+    - platform: state
+      entity_id: input_select.lms_command
+      to: "player pause"
+    action:
+    - service: script.turn_on
+      data_template:
+        entity_id: script.lms_cmd_pause_player
+        
+# LMS GUI Command for re-start of player
+  - alias: "LMS GUI Player Re-start Command"
+    initial_state: true
+    trigger:
+    - platform: state
+      entity_id: input_select.lms_command
+      to: "player restart"
+    action:
+    - service: script.turn_on
+      data_template:
+        entity_id: script.lms_cmd_start_player
+
+# LMS GUI Master Sync Controls 
+  - alias: "LMS GUI Add Song Command"
+    initial_state: true
+    trigger:
+    - platform: state
+      entity_id: input_select.lms_sync_master
+    action:
+    - service: input_boolean.turn_off
+      data_template:
+        entity_id: group.lms_sync_players
+
+# LMS GUI Player_1 Sync Controls - on
+  - alias: "LMS GUI Player 1 Sync Controls - ON"
+    initial_state: true
+    trigger:
+    - platform: state
+      entity_id: input_boolean.lms_player1_sync
+      to: "on"
+    action:
+    - service:  media_player.squeezebox_call_method
+      data_template:
+        entity_id: "media_player.{{states.input_select.lms_sync_master.state}}"
+        command: "sync"
+        parameters: ['{{ state_attr("media_player." + states.input_boolean.lms_player1_sync.name, "playerid") }}']
+
+# LMS GUI Player_1 Sync Controls - off
+  - alias: "LMS GUI Player 1 Sync Controls - OFF"
+    initial_state: true
+    trigger:
+    - platform: state
+      entity_id: input_boolean.lms_player1_sync
+      to: "off"
+    action:
+    - service:  media_player.squeezebox_call_method
+      data_template:
+        entity_id: media_player.{{states.input_boolean.lms_player1_sync.name}}
+        command: "sync"
+        parameters: ["-"]
+
+# LMS GUI Player_2 Sync Controls - on
+  - alias: "LMS GUI Player 2 Sync Controls - ON"
+    initial_state: true
+    trigger:
+    - platform: state
+      entity_id: input_boolean.lms_player2_sync
+      to: "on"
+    action:
+    - service:  media_player.squeezebox_call_method
+      data_template:
+        entity_id: "media_player.{{states.input_select.lms_sync_master.state}}"
+        command: "sync"
+        parameters: ['{{ state_attr("media_player." + states.input_boolean.lms_player2_sync.name, "playerid") }}']
+
+# LMS GUI Player_2 Sync Controls - off
+  - alias: "LMS GUI Player 2 Sync Controls - OFF"
+    initial_state: true
+    trigger:
+    - platform: state
+      entity_id: input_boolean.lms_player2_sync
+      to: "off"
+    action:
+    - service:  media_player.squeezebox_call_method
+      data_template:
+        entity_id: media_player.{{states.input_boolean.lms_player2_sync.name}}
+        command: "sync"
+        parameters: ["-"]
+
+# LMS GUI Player_3 Sync Controls - on
+  - alias: "LMS GUI Player 3 Sync Controls - ON"
+    initial_state: true
+    trigger:
+    - platform: state
+      entity_id: input_boolean.lms_player3_sync
+      to: "on"
+    action:
+    - service:  media_player.squeezebox_call_method
+      data_template:
+        entity_id: "media_player.{{states.input_select.lms_sync_master.state}}"
+        command: "sync"
+        parameters: ['{{ state_attr("media_player." + states.input_boolean.lms_player3_sync.name, "playerid") }}']
+
+# LMS GUI Player_3 Sync Controls - off
+  - alias: "LMS GUI Player 3 Sync Controls - OFF"
+    initial_state: true
+    trigger:
+    - platform: state
+      entity_id: input_boolean.lms_player3_sync
+      to: "off"
+    action:
+    - service:  media_player.squeezebox_call_method
+      data_template:
+        entity_id: media_player.{{states.input_boolean.lms_player3_sync.name}}
+        command: "sync"
+        parameters: ["-"]
+        
+# LMS GUI Player_4 Sync Controls - on
+  - alias: "LMS GUI Player 4 Sync Controls - ON"
+    initial_state: true
+    trigger:
+    - platform: state
+      entity_id: input_boolean.lms_player4_sync
+      to: "on"
+    action:
+    - service:  media_player.squeezebox_call_method
+      data_template:
+        entity_id: "media_player.{{states.input_select.lms_sync_master.state}}"
+        command: "sync"
+        parameters: ['{{ state_attr("media_player." + states.input_boolean.lms_player4_sync.name, "playerid") }}']
+
+# LMS GUI Player_4 Sync Controls - off
+  - alias: "LMS GUI Player 4 Sync Controls - OFF"
+    initial_state: true
+    trigger:
+    - platform: state
+      entity_id: input_boolean.lms_player4_sync
+      to: "off"
+    action:
+    - service:  media_player.squeezebox_call_method
+      data_template:
+        entity_id: media_player.{{states.input_boolean.lms_player4_sync.name}}
+        command: "sync"
+        parameters: ["-"]
+        
+# LMS GUI Player_5 Sync Controls - on
+  - alias: "LMS GUI Player 5 Sync Controls - ON"
+    initial_state: true
+    trigger:
+    - platform: state
+      entity_id: input_boolean.lms_player5_sync
+      to: "on"
+    action:
+    - service:  media_player.squeezebox_call_method
+      data_template:
+        entity_id: "media_player.{{states.input_select.lms_sync_master.state}}"
+        command: "sync"
+        parameters: ['{{ state_attr("media_player." + states.input_boolean.lms_player5_sync.name, "playerid") }}']
+
+# LMS GUI Player_5 Sync Controls - off
+  - alias: "LMS GUI Player 5 Sync Controls - OFF"
+    initial_state: true
+    trigger:
+    - platform: state
+      entity_id: input_boolean.lms_player5_sync
+      to: "off"
+    action:
+    - service:  media_player.squeezebox_call_method
+      data_template:
+        entity_id: media_player.{{states.input_boolean.lms_player5_sync.name}}
+        command: "sync"
+        parameters: ["-"]
+
+# LMS GUI Player_6 Sync Controls - on
+  - alias: "LMS GUI Player 6 Sync Controls - ON"
+    initial_state: true
+    trigger:
+    - platform: state
+      entity_id: input_boolean.lms_player6_sync
+      to: "on"
+    action:
+    - service:  media_player.squeezebox_call_method
+      data_template:
+        entity_id: "media_player.{{states.input_select.lms_sync_master.state}}"
+        command: "sync"
+        parameters: ['{{ state_attr("media_player." + states.input_boolean.lms_player6_sync.name, "playerid") }}']
+
+# LMS GUI Player_6 Sync Controls - off
+  - alias: "LMS GUI Player 6 Sync Controls - OFF"
+    initial_state: true
+    trigger:
+    - platform: state
+      entity_id: input_boolean.lms_player6_sync
+      to: "off"
+    action:
+    - service:  media_player.squeezebox_call_method
+      data_template:
+        entity_id: media_player.{{states.input_boolean.lms_player6_sync.name}}
+        command: "sync"
+        parameters: ["-"]
+
+# LMS GUI Player_7 Sync Controls - on
+  - alias: "LMS GUI Player 7 Sync Controls - ON"
+    initial_state: true
+    trigger:
+    - platform: state
+      entity_id: input_boolean.lms_player7_sync
+      to: "on"
+    action:
+    - service:  media_player.squeezebox_call_method
+      data_template:
+        entity_id: "media_player.{{states.input_select.lms_sync_master.state}}"
+        command: "sync"
+        parameters: ['{{ state_attr("media_player." + states.input_boolean.lms_player7_sync.name, "playerid") }}']
+
+# LMS GUI Player_7 Sync Controls - off
+  - alias: "LMS GUI Player 7 Sync Controls - OFF"
+    initial_state: true
+    trigger:
+    - platform: state
+      entity_id: input_boolean.lms_player7_sync
+      to: "off"
+    action:
+    - service:  media_player.squeezebox_call_method
+      data_template:
+        entity_id: media_player.{{states.input_boolean.lms_player7_sync.name}}
+        command: "sync"
+        parameters: ["-"]
+
+# LMS GUI Player_8 Sync Controls - on
+  - alias: "LMS GUI Player 8 Sync Controls - ON"
+    initial_state: true
+    trigger:
+    - platform: state
+      entity_id: input_boolean.lms_player8_sync
+      to: "on"
+    action:
+    - service:  media_player.squeezebox_call_method
+      data_template:
+        entity_id: "media_player.{{states.input_select.lms_sync_master.state}}"
+        command: "sync"
+        parameters: ['{{ state_attr("media_player." + states.input_boolean.lms_player8_sync.name, "playerid") }}']
+
+# LMS GUI Player_8 Sync Controls - off
+  - alias: "LMS GUI Player 8 Sync Controls - OFF"
+    initial_state: true
+    trigger:
+    - platform: state
+      entity_id: input_boolean.lms_player8_sync
+      to: "off"
+    action:
+    - service:  media_player.squeezebox_call_method
+      data_template:
+        entity_id: media_player.{{states.input_boolean.lms_player8_sync.name}}
+        command: "sync"
+        parameters: ["-"]
+
+# LMS GUI Player_9 Sync Controls - on
+  - alias: "LMS GUI Player 9 Sync Controls - ON"
+    initial_state: true
+    trigger:
+    - platform: state
+      entity_id: input_boolean.lms_player9_sync
+      to: "on"
+    action:
+    - service:  media_player.squeezebox_call_method
+      data_template:
+        entity_id: "media_player.{{states.input_select.lms_sync_master.state}}"
+        command: "sync"
+        parameters: ['{{ state_attr("media_player." + states.input_boolean.lms_player9_sync.name, "playerid") }}']
+
+# LMS GUI Player_9 Sync Controls - off
+  - alias: "LMS GUI Player 9 Sync Controls - OFF"
+    initial_state: true
+    trigger:
+    - platform: state
+      entity_id: input_boolean.lms_player9_sync
+      to: "off"
+    action:
+    - service:  media_player.squeezebox_call_method
+      data_template:
+        entity_id: media_player.{{states.input_boolean.lms_player9_sync.name}}
+        command: "sync"
+        parameters: ["-"]
+
+# LMS GUI Player_10 Sync Controls - on
+  - alias: "LMS GUI Player 10 Sync Controls - ON"
+    initial_state: true
+    trigger:
+    - platform: state
+      entity_id: input_boolean.lms_player10_sync
+      to: "on"
+    action:
+    - service:  media_player.squeezebox_call_method
+      data_template:
+        entity_id: "media_player.{{states.input_select.lms_sync_master.state}}"
+        command: "sync"
+        parameters: ['{{ state_attr("media_player." + states.input_boolean.lms_player10_sync.name, "playerid") }}']
+
+# LMS GUI Player_10 Sync Controls - off
+  - alias: "LMS GUI Player 10 Sync Controls - OFF"
+    initial_state: true
+    trigger:
+    - platform: state
+      entity_id: input_boolean.lms_player10_sync
+      to: "off"
+    action:
+    - service:  media_player.squeezebox_call_method
+      data_template:
+        entity_id: media_player.{{states.input_boolean.lms_player10_sync.name}}
+        command: "sync"
+        parameters: ["-"]
+
+
+script:
+    lms_do_nothing:
+      alias:  "LMS command to do nothing"
+      sequence:
+        - delay: 00:00:01
+    
+    lms_cmd_play_song:
+      alias:  "LMS command to play LMS song"
+      sequence:
+        - service: shell_command.lms_qry_alb_song
+          data_template:
+            text1: "_{{states.input_text.lms_artist.state | e | replace('&#39;','') | replace(' ','_')}}"
+            text2: "_{{states.input_text.lms_album.state | e | replace('&#39;','') | replace(' ','_')}}"
+            text3: "_{{states.input_text.lms_song.state | e | replace('&#39;','') | replace(' ','_')}}"
+        - condition: template 
+          value_template: "{{ states.input_text.lms_qry_result.state != 'null' }}"
+        - service:  media_player.squeezebox_call_method
+          data_template: 
+            entity_id: "media_player.{{states.input_select.lms_player.state}}"
+            command: playlistcontrol
+            parameters: ["cmd:load","track_id:{{states.sensor.song_id.state}}"]
+    
+    lms_cmd_play_song_spot:
+      alias:  "LMS command to play Spotify song"
+      sequence:
+        - service: shell_command.lms_spot_art_alb_song
+          data_template:
+            text3: "{{states.input_text.lms_artist.state | e | replace('&#39;','') | replace(' ','+')}}"
+            text2: "{{states.input_text.lms_album.state | e | replace('&#39;','') | replace(' ','+')}}"
+            text1: "{{states.input_text.lms_song.state | e | replace('&#39;','') | replace(' ','+')}}"
+        - condition: template 
+          value_template: "{{ states.input_text.lms_qry_result.state != 'null' }}"
+        - service:  media_player.squeezebox_call_method
+          data_template: 
+            entity_id: "media_player.{{states.input_select.lms_player.state}}"
+            command: playlist
+            parameters: ["play","{{states.sensor.spotify_uri.state}}"]
+    
+    lms_cmd_add_song:
+      alias:  "LMS command to add LMS song to the queue"
+      sequence:
+        - service: shell_command.lms_qry_alb_song
+          data_template:
+            text1: "_{{states.input_text.lms_artist.state | e | replace('&#39;','') | replace(' ','_')}}"
+            text2: "_{{states.input_text.lms_album.state | e | replace('&#39;','') | replace(' ','_')}}"
+            text3: "_{{states.input_text.lms_song.state | e | replace('&#39;','') | replace(' ','_')}}"
+        - condition: template 
+          value_template: "{{ states.input_text.lms_qry_result.state != 'null' }}"
+        - service:  media_player.squeezebox_call_method
+          data_template: 
+            entity_id: "media_player.{{states.input_select.lms_player.state}}"
+            command: playlistcontrol
+            parameters: ["cmd:add","track_id:{{states.sensor.song_id.state}}"]
+    
+    lms_cmd_add_song_spot:
+      alias:  "LMS command to add Spotify song to the queue"
+      sequence:
+        - service: script.turn_on
+          data_template:
+            entity_id: script.lms_cmd_shuffle
+        - service: shell_command.lms_spot_art_alb_song
+          data_template:
+            text3: "{{states.input_text.lms_artist.state | e | replace('&#39;','') | replace(' ','+')}}"
+            text2: "{{states.input_text.lms_album.state | e | replace('&#39;','') | replace(' ','+')}}"
+            text1: "{{states.input_text.lms_song.state | e | replace('&#39;','') | replace(' ','+')}}"
+        - condition: template 
+          value_template: "{{ states.input_text.lms_qry_result.state != 'null' }}"
+        - service:  media_player.squeezebox_call_method
+          data_template: 
+            entity_id: "media_player.{{states.input_select.lms_player.state}}"
+            command: playlist
+            parameters: ["add","{{states.sensor.spotify_uri.state}}"]
+    
+    lms_cmd_play_playlist:
+      alias:  "LMS command to play LMS playlist"
+      sequence:
+        - service: shell_command.lms_qry_playlist
+          data_template:
+            text1: "_{{states.input_text.lms_playlist.state | e | replace('&#39;','') | replace(' ','_')}}"
+        - condition: template 
+          value_template: "{{ states.input_text.lms_qry_result.state != 'null' }}"
+        - service:  media_player.squeezebox_call_method
+          data_template: 
+            entity_id: "media_player.{{states.input_select.lms_player.state}}"
+            command: playlistcontrol
+            parameters: ["cmd:load","playlist_id:{{states.sensor.playlist_id.state}}"]
+
+    lms_cmd_play_playlist_spot:
+      alias:  "LMS command to play Spotify playlist"
+      sequence:
+        - service: shell_command.lms_spot_playlist
+          data_template:
+            text1: "{{states.input_text.lms_playlist.state | e | replace('&#39;','') | replace(' ','+')}}"
+        - condition: template 
+          value_template: "{{ states.input_text.lms_qry_result.state != 'null' }}"
+        - service:  media_player.squeezebox_call_method
+          data_template: 
+            entity_id: "media_player.{{states.input_select.lms_player.state}}"
+            command: playlist
+            parameters: ["play","{{states.sensor.spotify_uri.state}}"]
+    
+    lms_cmd_add_playlist:
+      alias:  "LMS command to add LMS playlist to the queue"
+      sequence:
+        - service: shell_command.lms_qry_playlist
+          data_template:
+            text1: "_{{states.input_text.lms_playlist.state | e | replace('&#39;','') | replace(' ','_')}}"
+        - condition: template 
+          value_template: "{{ states.input_text.lms_qry_result.state != 'null' }}"
+        - service:  media_player.squeezebox_call_method
+          data_template: 
+            entity_id: "media_player.{{states.input_select.lms_player.state}}"
+            command: playlistcontrol
+            parameters: ["cmd:add","playlist_id:{{states.sensor.playlist_id.state}}"]
+    
+    lms_cmd_add_playlist_spot:
+      alias:  "LMS command to add Spotify playlist"
+      sequence:
+        - service: shell_command.lms_spot_playlist
+          data_template:
+            text1: "{{states.input_text.lms_playlist.state | e | replace('&#39;','') | replace(' ','+')}}"
+        - condition: template 
+          value_template: "{{ states.input_text.lms_qry_result.state != 'null' }}"
+        - service:  media_player.squeezebox_call_method
+          data_template: 
+            entity_id: "media_player.{{states.input_select.lms_player.state}}"
+            command: playlist
+            parameters: ["add","{{states.sensor.spotify_uri.state}}"]
+    
+    lms_cmd_play_artist:
+      alias:  "LMS command to play LMS artist"
+      sequence:
+        - service: shell_command.lms_qry_art
+          data_template:
+            text1: "_{{states.input_text.lms_artist.state | e | replace('&#39;','') | replace(' ','_')}}"
+        - condition: template 
+          value_template: "{{ states.input_text.lms_qry_result.state != 'null' }}"
+        - service:  media_player.squeezebox_call_method
+          data_template: 
+            entity_id: "media_player.{{states.input_select.lms_player.state}}"
+            command: playlistcontrol
+            parameters: ["cmd:load","artist_id:{{states.sensor.art_id.state}}"]
+
+    
+    lms_cmd_play_artist_spot:
+      alias:  "LMS command to play Spotify artist"
+      sequence:
+        - service: shell_command.lms_spot_art
+          data_template:
+            text1: "{{states.input_text.lms_artist.state | e | replace('&#39;','') | replace(' ','+')}}"
+        - condition: template 
+          value_template: "{{ states.input_text.lms_qry_result.state != 'null' }}"
+        - service:  media_player.squeezebox_call_method
+          data_template: 
+            entity_id: "media_player.{{states.input_select.lms_player.state}}"
+            command: playlist
+            parameters: ["play","{{states.sensor.spotify_uri.state}}"]
+    
+    lms_cmd_add_artist:
+      alias:  "LMS command to add LMS artist to the queue"
+      sequence:
+        - service: shell_command.lms_qry_art
+          data_template:
+            text1: "_{{states.input_text.lms_artist.state | e | replace('&#39;','') | replace(' ','_')}}"
+        - condition: template 
+          value_template: "{{ states.input_text.lms_qry_result.state != 'null' }}"
+        - service:  media_player.squeezebox_call_method
+          data_template: 
+            entity_id: "media_player.{{states.input_select.lms_player.state}}"
+            command: playlistcontrol
+            parameters: ["cmd:add","artist_id:{{states.sensor.art_id.state}}"]
+
+    lms_cmd_add_artist_spot:
+      alias:  "LMS command to add LMS artist to the queue"
+      sequence:
+        - service: shell_command.lms_spot_art
+          data_template:
+            text1: "{{states.input_text.lms_artist.state | e | replace('&#39;','') | replace(' ','+')}}"
+        - condition: template 
+          value_template: "{{ states.input_text.lms_qry_result.state != 'null' }}"
+        - service:  media_player.squeezebox_call_method
+          data_template: 
+            entity_id: "media_player.{{states.input_select.lms_player.state}}"
+            command: playlist
+            parameters: ["add","{{states.sensor.spotify_uri.state}}"]
+    
+    lms_cmd_play_album:
+      alias:  "LMS command to play LMS album"
+      sequence:
+        - service: shell_command.lms_qry_alb
+          data_template:
+            text1: "_{{states.input_text.lms_artist.state | e | replace('&#39;','') | replace(' ','_')}}"
+            text2: "{{states.input_text.lms_album.state | e | replace('&#39;','') | replace(' ','_')}}"
+        - condition: template 
+          value_template: "{{ states.input_text.lms_qry_result.state != 'null' }}"
+        - service:  media_player.squeezebox_call_method
+          data_template: 
+            entity_id: "media_player.{{states.input_select.lms_player.state}}"
+            command: playlistcontrol
+            parameters: ["cmd:load","album_id:{{states.sensor.alb_id.state}}"]
+
+    lms_cmd_play_album_spot:
+      alias:  "LMS command to play Spotify album"
+      sequence:
+        - service: shell_command.lms_spot_art_alb
+          data_template:
+            text1: "{{states.input_text.lms_album.state | e | replace('&#39;','') | replace(' ','+')}}"
+            text2: "{{states.input_text.lms_artist.state | e | replace('&#39;','') | replace(' ','+')}}"
+        - condition: template 
+          value_template: "{{ states.input_text.lms_qry_result.state != 'null' }}"
+        - service:  media_player.squeezebox_call_method
+          data_template: 
+            entity_id: "media_player.{{states.input_select.lms_player.state}}"
+            command: playlist
+            parameters: ["play","{{states.sensor.spotify_uri.state}}"]
+    
+    lms_cmd_add_album:
+      alias:  "LMS command to add LMS album to the queue"
+      sequence:
+        - service: shell_command.lms_qry_alb
+          data_template:
+            text1: "_{{states.input_text.lms_artist.state | e | replace('&#39;','') | replace(' ','_')}}"
+            text2: "{{states.input_text.lms_album.state | e | replace('&#39;','') | replace(' ','_')}}"
+        - condition: template 
+          value_template: "{{ states.input_text.lms_qry_result.state != 'null' }}"
+        - service:  media_player.squeezebox_call_method
+          data_template: 
+            entity_id: "media_player.{{states.input_select.lms_player.state}}"
+            command: playlistcontrol
+            parameters: ["cmd:add","album_id:{{states.sensor.alb_id.state}}"]
+            
+    lms_cmd_add_album_spot:
+      alias:  "LMS command to add LMS album to the queue"
+      sequence:
+        - service: shell_command.lms_spot_art_alb
+          data_template:
+            text1: "{{states.input_text.lms_album.state | e | replace('&#39;','') | replace(' ','+')}}"
+            text2: "{{states.input_text.lms_artist.state | e | replace('&#39;','') | replace(' ','+')}}"
+        - condition: template 
+          value_template: "{{ states.input_text.lms_qry_result.state != 'null' }}"
+        - service:  media_player.squeezebox_call_method
+          data_template: 
+            entity_id: "media_player.{{states.input_select.lms_player.state}}"
+            command: playlist
+            parameters: ["add","{{states.sensor.spotify_uri.state}}"]
+    
+    lms_cmd_next_track:
+      alias:  "LMS command to advance to the next track"
+      sequence:
+        - service:  media_player.media_next_track
+          data_template:
+            entity_id: "media_player.{{states.input_select.lms_player.state}}"
+            
+    lms_cmd_pause_player:
+      alias:  "LMS command to pause a media player"
+      sequence:
+        - service:  media_player.media_pause
+          data_template:
+            entity_id: "media_player.{{states.input_select.lms_player.state}}"
+    
+    lms_cmd_start_player:
+      alias:  "LMS command to re-start a media player"
+      sequence:
+        - service:  media_player.turn_on
+          data_template:
+            entity_id: "media_player.{{states.input_select.lms_player.state}}"
+        - service:  media_player.media_play
+          data_template:
+            entity_id: "media_player.{{states.input_select.lms_player.state}}"
+    
+    lms_cmd_play_radio:
+      alias:  "LMS command to play radio station"
+      sequence:
+        - service:  media_player.squeezebox_call_method
+          data_template:
+            entity_id: "media_player.{{states.input_select.lms_player.state}}"
+            command: playlist
+            parameters: ["play",'Radio_{{states.input_text.lms_playlist.state|title|trim|replace(" ","_")}}']
+    
+    lms_cmd_sync_one:
+      alias: "LMS command to Sync One Player to the Master"
+      sequence:
+        - service: input_boolean.turn_on
+          data_template:
+            entity_id: >
+                {% if (states.input_boolean.lms_player1_sync.name == states.input_text.lms_p1.state) %} input_boolean.lms_player1_sync
+                {% elif (states.input_boolean.lms_player2_sync.name == states.input_text.lms_p1.state) %} input_boolean.lms_player2_sync
+                {% elif (states.input_boolean.lms_player3_sync.name == states.input_text.lms_p1.state) %} input_boolean.lms_player3_sync
+                {% elif (states.input_boolean.lms_player4_sync.name == states.input_text.lms_p1.state) %} input_boolean.lms_player4_sync
+                {% elif (states.input_boolean.lms_player5_sync.name == states.input_text.lms_p1.state) %} input_boolean.lms_player5_sync
+                {% elif (states.input_boolean.lms_player5_sync.name == states.input_text.lms_p1.state) %} input_boolean.lms_player6_sync
+                {% elif (states.input_boolean.lms_player5_sync.name == states.input_text.lms_p1.state) %} input_boolean.lms_player7_sync
+                {% elif (states.input_boolean.lms_player5_sync.name == states.input_text.lms_p1.state) %} input_boolean.lms_player8_sync
+                {% elif (states.input_boolean.lms_player5_sync.name == states.input_text.lms_p1.state) %} input_boolean.lms_player9_sync
+                {% elif (states.input_boolean.lms_player5_sync.name == states.input_text.lms_p1.state) %} input_boolean.lms_player10_sync
+                {% endif %}
+    
+    lms_cmd_sync_all:
+      alias: "LMS command to Sync All Players to the Master"
+      sequence:
+        - service: input_boolean.turn_on
+          data_template:
+            entity_id: >
+                {% if (states.input_text.lms_command_intent.state == "sync all") %} 
+                    input_boolean.lms_player1_sync, input_boolean.lms_player2_sync, input_boolean.lms_player3_sync, 
+                    input_boolean.lms_player4_sync, input_boolean.lms_player5_sync, input_boolean.lms_player6_sync,
+                    input_boolean.lms_player7_sync, input_boolean.lms_player8_sync, input_boolean.lms_player9_sync, input_boolean.lms_player10_sync
+                {% endif %}
+  
+    lms_cmd_unsync_one:
+      alias: "LMS command to Un-Sync One Player from the Master"
+      sequence:
+        - service: input_boolean.turn_off
+          data_template:
+            entity_id: >
+                {% if (states.input_boolean.lms_player1_sync.name == states.input_text.lms_p1.state) %} input_boolean.lms_player1_sync
+                {% elif (states.input_boolean.lms_player2_sync.name == states.input_text.lms_p1.state) %} input_boolean.lms_player2_sync
+                {% elif (states.input_boolean.lms_player3_sync.name == states.input_text.lms_p1.state) %} input_boolean.lms_player3_sync
+                {% elif (states.input_boolean.lms_player4_sync.name == states.input_text.lms_p1.state) %} input_boolean.lms_player4_sync
+                {% elif (states.input_boolean.lms_player5_sync.name == states.input_text.lms_p1.state) %} input_boolean.lms_player5_sync
+                {% elif (states.input_boolean.lms_player5_sync.name == states.input_text.lms_p1.state) %} input_boolean.lms_player6_sync
+                {% elif (states.input_boolean.lms_player5_sync.name == states.input_text.lms_p1.state) %} input_boolean.lms_player7_sync
+                {% elif (states.input_boolean.lms_player5_sync.name == states.input_text.lms_p1.state) %} input_boolean.lms_player8_sync
+                {% elif (states.input_boolean.lms_player5_sync.name == states.input_text.lms_p1.state) %} input_boolean.lms_player9_sync
+                {% elif (states.input_boolean.lms_player5_sync.name == states.input_text.lms_p1.state) %} input_boolean.lms_player10_sync
+                {% endif %}
+    
+    lms_cmd_unsync_all:
+      alias: "LMS command to Un-Sync All Players from the Master"
+      sequence:
+        - service: input_boolean.turn_off
+          data_template:
+            entity_id: >
+                {% if (states.input_text.lms_command_intent.state == "unsync all") %} 
+                    input_boolean.lms_player1_sync, input_boolean.lms_player2_sync, input_boolean.lms_player3_sync, 
+                    input_boolean.lms_player4_sync, input_boolean.lms_player5_sync, input_boolean.lms_player6_sync,
+                    input_boolean.lms_player7_sync, input_boolean.lms_player8_sync, input_boolean.lms_player9_sync, input_boolean.lms_player10_sync
+                {% endif %}
+
+group:
+  lms_controls:
+    name: LMS Controls
+    view: yes
+    entities:
+        - group.lms_player
+        - group.lms_sync_players
+        - group.all_lms_players
+
+  lms_player:
+    name: LMS Music Player Controls
+    control: hidden
+    entities:
+    - input_select.lms_player
+    - input_number.lms_volume
+    - input_number.lms_sleep_time
+    - input_select.lms_source
+    - input_text.lms_artist
+    - input_text.lms_album
+    - input_text.lms_song
+    - input_text.lms_playlist
+    - input_select.lms_command
+    - script.lms_cmd_pause_player
+    - script.lms_cmd_start_player
+    - script.lms_cmd_next_track
+    - input_boolean.lms_shuffle
+    - input_boolean.lms_repeat
+
+  lms_sync_players:
+    name: List of Sync Players
+    entities:
+###  To be updated as required
+###       add or remove comments to enable up to 10 players
+    - input_select.lms_sync_master
+    - input_boolean.lms_player1_sync
+    - input_boolean.lms_player2_sync
+    - input_boolean.lms_player3_sync
+    - input_boolean.lms_player4_sync
+    - input_boolean.lms_player5_sync
+    - input_boolean.lms_player6_sync
+    - input_boolean.lms_player7_sync
+#    - input_boolean.lms_player8_sync
+#    - input_boolean.lms_player9_sync
+#    - input_boolean.lms_player10_sync
+#    - type: divider
+    - input_text.lms_qry_result
+
+  all_lms_players:
+    name: All LMS Media Players
+    icon: mdi:music
+    control: hidden
+    view: no
+###  To be updated as required
+###       Update the media_player entities below to view player status in GUI
+    entities:
+      - media_player.googlehome
+      - media_player.googlemini_1
+      - media_player.googlemini_2
+      - media_player.mediaroom
+      - media_player.kitchen
+      - media_player.familyroom
+      - media_player.garage
+      - media_player.masterbedroom
