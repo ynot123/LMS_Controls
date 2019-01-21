@@ -15,6 +15,20 @@ Thanks and enjoy.
 
 Ynot.
 
+**January 21, 2019 - LMS Controls Project**
+
+Minor update to the shell files and the package file was required, basic details are as follows:
+
+**Shell files:**
+- Fixed dangling quote / double quote in all shell files except env_var.sh. - CRITICAL this prevented proper posting of shell query results on some systems
+- Fixed hard coded URL in qry_player_stat.sh - CRITICAL
+
+**Package file:**
+- Fixed some duplicate alias', NON-CRITICAL
+
+Sorry for the inconvenience. Ynot.
+
+
 ## LMS Controls:
 Control your Logitech / Squeezeserver players (LMS) from Home Assistant (HA) and Google Home (GH). A little [audio demo](https://github.com/ynot123/LMS_Controls/blob/master/LMS%20Controls%20Demo.mp3) is available.  Also see the Home Assistant GUI below.
 
