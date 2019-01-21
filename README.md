@@ -15,16 +15,15 @@ Thanks and enjoy.
 
 Ynot.
 
-**January 21, 2019 - LMS Controls Project**
+### January 21, 2019 - LMS Controls Project
 
 Minor update to the shell files and the package file was required, basic details are as follows:
+- **Shell files:**
+  - Fixed dangling quote / double quote in all shell files except env_var.sh. - CRITICAL this prevented proper posting of shell query results on some systems
+  - Fixed hard coded URL in qry_player_stat.sh - CRITICAL
 
-**Shell files:**
-- Fixed dangling quote / double quote in all shell files except env_var.sh. - CRITICAL this prevented proper posting of shell query results on some systems
-- Fixed hard coded URL in qry_player_stat.sh - CRITICAL
-
-**Package file:**
-- Fixed some duplicate alias', NON-CRITICAL
+- **Package file:**
+  - Fixed some duplicate alias', NON-CRITICAL
 
 Sorry for the inconvenience. Ynot.
 
