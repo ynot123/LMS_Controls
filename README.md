@@ -15,7 +15,7 @@ Thanks and enjoy.
 
 Ynot.
 
-### January 21, 2019 - LMS Controls Project
+### January 21, 2019 - LMS Controls Project Update
 
 Minor update to the shell files and the package file was required, basic details are as follows:
 - **Shell files:**
