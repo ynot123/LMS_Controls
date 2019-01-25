@@ -1,4 +1,7 @@
 ## NEWS ....
+#### LMS Controls Project Updated - January 24, 2019
+Updated package file lmscontrols.yaml changing **platform: time** to **platform: time_pattern**.  Breaking change in HA 0.86+
+
 #### LMS Controls Project Updated - January 18, 2019
 Updated Home Assistant Installation to make use of package file (an all-in-one file) that holds the bulk of the programming for the LMS Controls project.
 New features / upgrades include:
