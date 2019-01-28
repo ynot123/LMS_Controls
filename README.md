@@ -1,7 +1,7 @@
 ## LATEST CHANGES ....
 #### LMS Controls Project Updated - January 27, 2019
 
-Updated script config/shell/spot_playlist.sh to randomly pick 1 of the top 10 playlists returned from the query.  This way you get a bit more variety when asking for a particular Spotify playlist rather than always getting the top playlist returned.  
+Updated script **config/shell/spot_playlist.sh** to randomly pick 1 of the top 10 playlists returned from the query.  This way you get a bit more variety when asking for a Spotify playlist rather than always getting the top playlist returned.  
 
 #### LMS Controls Project Updated - January 24, 2019
 
