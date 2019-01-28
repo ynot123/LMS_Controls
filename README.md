@@ -1,5 +1,10 @@
 ## NEWS ....
+#### LMS Controls Project Updated - January 27, 2019
+
+Updated script config/shell/spot_playlist.sh to randomly pick 1 of the top 10 playlists returned from the query.  This way you get a bit more variety when asking for a particular Spotify playlist rather than always getting the top playlist returned.  
+
 #### LMS Controls Project Updated - January 24, 2019
+
 Updated package file lmscontrols.yaml changing **platform: time** to **platform: time_pattern** due to breaking change in Home Assistant 0.86+
 
 #### LMS Controls Project Updated - January 18, 2019
