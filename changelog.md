@@ -1,11 +1,19 @@
 ## LMS Controls - Change Log
 
-**January 21, 2019 - LMS Controls Project**
+**January 27, 2019**
+
+Updated script **config/shell/spot_playlist.sh** to randomly pick 1 of the top 10 playlists returned from the query.  This way you get a bit more variety when asking for a particular Spotify playlist rather than always getting the top playlist returned.  
+
+**January 24, 2019**
+
+Updated package file lmscontrols.yaml changing **platform: time** to **platform: time_pattern** due to breaking change in Home Assistant 0.86+
+
+**January 21, 2019**
 
 Minor update to the shell files and the package file was required, basic details are as follows:
 - **Shell files:**
-  - Fixed dangling quote / double quote in all shell files except env_var.sh. - CRITICAL this prevented proper posting of shell query results on some systems
-  - Fixed hard coded URL in qry_player_stat.sh - CRITICAL
+  - Fixed dangling quote / double quote in all shell files except env_var.sh. - **CRITICAL** this prevented proper posting of shell query results on some systems
+  - Fixed hard coded URL in qry_player_stat.sh - **CRITICAL**
 
 - **Package file:**
   - Fixed some duplicate alias', NON-CRITICAL
