@@ -1,31 +1,11 @@
-## NEWS ....
+## LATEST CHANGES ....
 #### LMS Controls Project Updated - January 27, 2019
 
-Updated script config/shell/spot_playlist.sh to randomly pick 1 of the top 10 playlists returned from the query.  This way you get a bit more variety when asking for a particular Spotify playlist rather than always getting the top playlist returned.  
+Updated Spotify query shell script **config/shell/spot_playlist.sh** to randomly pick 1 of the top 10 playlists returned from the query.  This way you get a bit more variety when asking for a Spotify playlist rather than always getting the top playlist returned.  
 
 #### LMS Controls Project Updated - January 24, 2019
 
 Updated package file lmscontrols.yaml changing **platform: time** to **platform: time_pattern** due to breaking change in Home Assistant 0.86+
-
-#### LMS Controls Project Updated - January 18, 2019
-Updated Home Assistant Installation to make use of package file (an all-in-one file) that holds the bulk of the programming for the LMS Controls project.
-New features / upgrades include:
-
-- Audio feedback of query results and player status
-- Created an env.sh file which contains the bulk of the shell file customization details
-- Better error checking
-- Support of contractions and
-- The ability to handle both secured and unsecured LMS installations.
-Updated installation and troubleshooting documents and created HassIO installation details document for multiple platforms to help users new to HassIO / Home Assistant.
-
-#### January 21, 2019 - LMS Controls Project Update
-
-Minor update to the shell files and the package file was required, basic details are as follows:
-- **Shell files:**
-  - Fixed dangling quote / double quote in all shell files except env_var.sh. - CRITICAL this prevented proper posting of shell query results on some systems
-  - Fixed hard coded URL in qry_player_stat.sh - CRITICAL
-- **Package file:**
-  - Fixed some duplicate alias', NON-CRITICAL
 
 
 
