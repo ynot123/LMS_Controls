@@ -77,7 +77,7 @@ then
         alb_id="0"
         if [ $lms_secure = 1 ]
         then 
-            query=$(printf "$login_str titles 0 20  search:$3 tags:al \n" | socat stdio tcp:192.168.0.20:9090,shut-none )
+            query=$(printf "$login_str titles 0 20  search:$3 tags:al \n" | socat stdio tcp:"$lms_ip":"$lms_cli_port",shut-none )
         else 
             query=$(printf "titles 0 20 search:$3 tags:al \nexit\n" | nc "$lms_ip" "$lms_cli_port" )
         fi
@@ -99,7 +99,7 @@ then
         echo "Album found so moving on to songs...." 
         if [ $lms_secure = 1 ]
         then 
-            query=$(printf "$login_str titles 0 20 album_id:$alb_id search:$3 tags:al \n" | socat stdio tcp:192.168.0.20:9090,shut-none )
+            query=$(printf "$login_str titles 0 20 album_id:$alb_id search:$3 tags:al \n" | socat stdio tcp:"$lms_ip":"$lms_cli_port",shut-none )
         else 
             query=$(printf "titles 0 20 album_id:$alb_id search:$3 tags:al \nexit\n" | nc "$lms_ip" "$lms_cli_port" )
         fi
@@ -126,7 +126,7 @@ else
     echo "Artist found so moving on to albums...."
     if [ $lms_secure = 1 ]
     then 
-        query=$(printf "$login_str albums 0 20 artist_id:$art_id search:$2 tags:al \n" | socat stdio tcp:192.168.0.20:9090,shut-none )
+        query=$(printf "$login_str albums 0 20 artist_id:$art_id search:$2 tags:al \n" | socat stdio tcp:"$lms_ip":"$lms_cli_port",shut-none )
     else 
         query=$(printf "albums 0 20 artist_id:$art_id search:$2 tags:al \nexit\n" | nc "$lms_ip" "$lms_cli_port" )
     fi
@@ -148,7 +148,7 @@ else
         echo
         if [ $lms_secure = 1 ]
         then 
-            query=$(printf "$login_str titles 0 20  artist_id:$art_id search:$3 tags:al \n" | socat stdio tcp:192.168.0.20:9090,shut-none )
+            query=$(printf "$login_str titles 0 20  artist_id:$art_id search:$3 tags:al \n" | socat stdio tcp:"$lms_ip":"$lms_cli_port",shut-none )
         else 
             query=$(printf "titles 0 20  artist_id:$art_id search:$3 tags:al \nexit\n" | nc "$lms_ip" "$lms_cli_port" )
         fi
@@ -173,7 +173,7 @@ else
         echo "Album found so moving on to songs...."
         if [ $lms_secure = 1 ]
         then 
-            query=$(printf "$login_str titles 0 20 artist_id:$art_id album_id:$alb_id search:$3 tags:al \n" | socat stdio tcp:192.168.0.20:9090,shut-none )
+            query=$(printf "$login_str titles 0 20 artist_id:$art_id album_id:$alb_id search:$3 tags:al \n" | socat stdio tcp:"$lms_ip":"$lms_cli_port",shut-none )
         else 
             query=$(printf "titles 0 20 artist_id:$art_id album_id:$alb_id search:$3 tags:al \nexit\n" | nc "$lms_ip" "$lms_cli_port" )
         fi
