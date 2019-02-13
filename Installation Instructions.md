@@ -138,7 +138,7 @@ The following section details the installation of the LMS Controls files for Has
 
 11. Modify the **lmscontrols.yaml** file as per the commented sections in the file.  **TIP:**  Search the file for text "To be updated as required" for areas requiring changes.  Sections to be modified are outlined below:
 
-    - In the **customize section**, update the **media_player.entity_id_name** and the **name** and the **player_id** fields to suit your LMS server player details.  Up to 10 media_players can be defined.
+    - In the **customize section**, update the **media_player.entity_id_name** and the **name** and the **player_id** fields to suit your LMS server player details.  Up to 10 media_players can be defined.  **Note:** The MAC address entries must be in lowercase.
     - In the **shell_command section**, review the defined path to the shell files to ensure it's consistent with your installations path (typically **/config/shell/**)
     - In the **input_boolean section**, update the lms_media_player1_sync **name** field to the same media_player **entity_id_name** defined in the customize section above.  Update up to **lms_media_player10_sync names**.  Leave any unused players defined as **unassigned**.
     - In the **input_select section**:
