@@ -1,7 +1,7 @@
 ## LATEST CHANGES ....
-#### LMS Controls Project Updated - October 24, 2019
+#### LMS Controls Project Updated - Dialogflow Support for V2 - October 24, 2019
 
-Dialogflow V1 api will be deprecated on October 23, 2019. If you are still using the V1 API, it is recommended to change your settings in Dialogflow to use the V2 API. No changes to your intents yaml configuration need to take place after upgrading to the V2 API. Change to the V2 API by clicking on the cog button here and then select the V2 API.
+Dialogflow V1 api will be deprecated on October 23, 2019. If you are still using the V1 API, it is recommended to change your settings in Dialogflow to use the V2 API. No changes to your intents yaml configuration need to take place after upgrading to the V2 API. 
 
 To update the dialogflow project, in Dialogflow console, simply press the gear icon and change from V1 to V2. Give it a try.
 
