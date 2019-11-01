@@ -1,4 +1,8 @@
 ## LATEST CHANGES ....
+#### Upgrade of HA from 0.99 to 0.101 required re-creation of Long Lived Tokens
+
+Please note, with the upgrade of HA from 0.99 to 0.101 I had to re-create my long lived tokens for the shell scripts (stored in env_var.sh) and in the fulfillment section of Dialogflow project to ensure proper authentication with Home Assistant.
+
 #### LMS Controls Project Updated - Dialogflow Support for V2 API - October 24, 2019
 
 Dialogflow V1 api will be deprecated on October 23, 2019. If you are still using the V1 API, it is recommended to change your settings in Dialogflow to use the V2 API. No changes to your intents yaml configuration need to take place after upgrading to the V2 API. 
