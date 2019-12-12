@@ -1,4 +1,9 @@
 ## LATEST CHANGES ....
+#### Dec. 12, 2019 Breaking Change - Upgrade of HA to version 0.103 requires Squeezebox service syntax change
+
+Please note, with the upgrade of HA to Version 0.103 the syntax has change for Squeezebox service calls.  In the script `lmscontrols.yaml` the commands `media_player.squeezebox_call_method` need to be changed to `squeezebox.call_method`.  
+
+
 #### Upgrade of HA from 0.99 to 0.101 required re-creation of Long Lived Tokens
 
 Please note, with the upgrade of HA from 0.99 to 0.101 I had to re-create my long lived tokens for the shell scripts (stored in env_var.sh) and in the fulfillment section of Dialogflow project to ensure proper authentication with Home Assistant.
