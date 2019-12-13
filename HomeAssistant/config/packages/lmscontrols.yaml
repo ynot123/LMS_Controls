@@ -1,5 +1,7 @@
 ###  LMS Controls Package - GoogleHome / Assistant Voice Control of Logitech Media Server
 ###
+###  Rev 9: Dec. 11, 2019     - Changed media_player.squeezebox_call_method to squeezebox.call_method due to breaking change at HA V0.103
+###  Rev 8:  April 8, 2019    - Withheld at this time
 ###  Rev 7:  January 24, 2019 - Changed platform: time to platform: time_pattern for HA version 0.86+
 ###  Rev 6: January 21,  2019 - Fixed some duplicate alias'
 ###  Rev 5: January 11,  2018 - Implemented more error checking in shell files when empty query results are returned, don't queue bad results
@@ -513,7 +515,7 @@ automation:
     - platform: state
       entity_id: input_number.lms_volume
     action:
-    - service:  media_player.squeezebox_call_method
+    - service:  squeezebox.call_method
       data_template:
         entity_id: "media_player.{{states.input_select.lms_player.state}}"
         command: "mixer"
@@ -526,7 +528,7 @@ automation:
     - platform: state
       entity_id: input_number.lms_sleep_time
     action:
-    - service:  media_player.squeezebox_call_method
+    - service:  squeezebox.call_method
       data_template:
         entity_id: "media_player.{{states.input_select.lms_player.state}}"
         command: "sleep"
@@ -559,7 +561,7 @@ automation:
         value:  >
             {% if (states.input_boolean.lms_repeat.state == "on") %} 2
             {% else %} 0 {% endif %}
-    - service:  media_player.squeezebox_call_method
+    - service:  squeezebox.call_method
       data_template:
         entity_id: "media_player.{{states.input_select.lms_player.state}}"
         command: "playlist"
@@ -796,7 +798,7 @@ automation:
       entity_id: input_boolean.lms_player1_sync
       to: "on"
     action:
-    - service:  media_player.squeezebox_call_method
+    - service:  squeezebox.call_method
       data_template:
         entity_id: "media_player.{{states.input_select.lms_sync_master.state}}"
         command: "sync"
@@ -810,7 +812,7 @@ automation:
       entity_id: input_boolean.lms_player1_sync
       to: "off"
     action:
-    - service:  media_player.squeezebox_call_method
+    - service:  squeezebox.call_method
       data_template:
         entity_id: media_player.{{states.input_boolean.lms_player1_sync.name}}
         command: "sync"
@@ -824,7 +826,7 @@ automation:
       entity_id: input_boolean.lms_player2_sync
       to: "on"
     action:
-    - service:  media_player.squeezebox_call_method
+    - service:  squeezebox.call_method
       data_template:
         entity_id: "media_player.{{states.input_select.lms_sync_master.state}}"
         command: "sync"
@@ -838,7 +840,7 @@ automation:
       entity_id: input_boolean.lms_player2_sync
       to: "off"
     action:
-    - service:  media_player.squeezebox_call_method
+    - service:  squeezebox.call_method
       data_template:
         entity_id: media_player.{{states.input_boolean.lms_player2_sync.name}}
         command: "sync"
@@ -852,7 +854,7 @@ automation:
       entity_id: input_boolean.lms_player3_sync
       to: "on"
     action:
-    - service:  media_player.squeezebox_call_method
+    - service:  squeezebox.call_method
       data_template:
         entity_id: "media_player.{{states.input_select.lms_sync_master.state}}"
         command: "sync"
@@ -866,7 +868,7 @@ automation:
       entity_id: input_boolean.lms_player3_sync
       to: "off"
     action:
-    - service:  media_player.squeezebox_call_method
+    - service:  squeezebox.call_method
       data_template:
         entity_id: media_player.{{states.input_boolean.lms_player3_sync.name}}
         command: "sync"
@@ -880,7 +882,7 @@ automation:
       entity_id: input_boolean.lms_player4_sync
       to: "on"
     action:
-    - service:  media_player.squeezebox_call_method
+    - service:  squeezebox.call_method
       data_template:
         entity_id: "media_player.{{states.input_select.lms_sync_master.state}}"
         command: "sync"
@@ -894,7 +896,7 @@ automation:
       entity_id: input_boolean.lms_player4_sync
       to: "off"
     action:
-    - service:  media_player.squeezebox_call_method
+    - service:  squeezebox.call_method
       data_template:
         entity_id: media_player.{{states.input_boolean.lms_player4_sync.name}}
         command: "sync"
@@ -908,7 +910,7 @@ automation:
       entity_id: input_boolean.lms_player5_sync
       to: "on"
     action:
-    - service:  media_player.squeezebox_call_method
+    - service:  squeezebox.call_method
       data_template:
         entity_id: "media_player.{{states.input_select.lms_sync_master.state}}"
         command: "sync"
@@ -922,7 +924,7 @@ automation:
       entity_id: input_boolean.lms_player5_sync
       to: "off"
     action:
-    - service:  media_player.squeezebox_call_method
+    - service:  squeezebox.call_method
       data_template:
         entity_id: media_player.{{states.input_boolean.lms_player5_sync.name}}
         command: "sync"
@@ -936,7 +938,7 @@ automation:
       entity_id: input_boolean.lms_player6_sync
       to: "on"
     action:
-    - service:  media_player.squeezebox_call_method
+    - service:  squeezebox.call_method
       data_template:
         entity_id: "media_player.{{states.input_select.lms_sync_master.state}}"
         command: "sync"
@@ -950,7 +952,7 @@ automation:
       entity_id: input_boolean.lms_player6_sync
       to: "off"
     action:
-    - service:  media_player.squeezebox_call_method
+    - service:  squeezebox.call_method
       data_template:
         entity_id: media_player.{{states.input_boolean.lms_player6_sync.name}}
         command: "sync"
@@ -964,7 +966,7 @@ automation:
       entity_id: input_boolean.lms_player7_sync
       to: "on"
     action:
-    - service:  media_player.squeezebox_call_method
+    - service:  squeezebox.call_method
       data_template:
         entity_id: "media_player.{{states.input_select.lms_sync_master.state}}"
         command: "sync"
@@ -978,7 +980,7 @@ automation:
       entity_id: input_boolean.lms_player7_sync
       to: "off"
     action:
-    - service:  media_player.squeezebox_call_method
+    - service:  squeezebox.call_method
       data_template:
         entity_id: media_player.{{states.input_boolean.lms_player7_sync.name}}
         command: "sync"
@@ -992,7 +994,7 @@ automation:
       entity_id: input_boolean.lms_player8_sync
       to: "on"
     action:
-    - service:  media_player.squeezebox_call_method
+    - service:  squeezebox.call_method
       data_template:
         entity_id: "media_player.{{states.input_select.lms_sync_master.state}}"
         command: "sync"
@@ -1006,7 +1008,7 @@ automation:
       entity_id: input_boolean.lms_player8_sync
       to: "off"
     action:
-    - service:  media_player.squeezebox_call_method
+    - service:  squeezebox.call_method
       data_template:
         entity_id: media_player.{{states.input_boolean.lms_player8_sync.name}}
         command: "sync"
@@ -1020,7 +1022,7 @@ automation:
       entity_id: input_boolean.lms_player9_sync
       to: "on"
     action:
-    - service:  media_player.squeezebox_call_method
+    - service:  squeezebox.call_method
       data_template:
         entity_id: "media_player.{{states.input_select.lms_sync_master.state}}"
         command: "sync"
@@ -1034,7 +1036,7 @@ automation:
       entity_id: input_boolean.lms_player9_sync
       to: "off"
     action:
-    - service:  media_player.squeezebox_call_method
+    - service:  squeezebox.call_method
       data_template:
         entity_id: media_player.{{states.input_boolean.lms_player9_sync.name}}
         command: "sync"
@@ -1048,7 +1050,7 @@ automation:
       entity_id: input_boolean.lms_player10_sync
       to: "on"
     action:
-    - service:  media_player.squeezebox_call_method
+    - service:  squeezebox.call_method
       data_template:
         entity_id: "media_player.{{states.input_select.lms_sync_master.state}}"
         command: "sync"
@@ -1062,7 +1064,7 @@ automation:
       entity_id: input_boolean.lms_player10_sync
       to: "off"
     action:
-    - service:  media_player.squeezebox_call_method
+    - service:  squeezebox.call_method
       data_template:
         entity_id: media_player.{{states.input_boolean.lms_player10_sync.name}}
         command: "sync"
@@ -1085,7 +1087,7 @@ script:
             text3: "_{{states.input_text.lms_song.state | e | replace('&#39;','') | replace(' ','_')}}"
         - condition: template 
           value_template: "{{ states.input_text.lms_qry_result.state != 'null' }}"
-        - service:  media_player.squeezebox_call_method
+        - service:  squeezebox.call_method
           data_template: 
             entity_id: "media_player.{{states.input_select.lms_player.state}}"
             command: playlistcontrol
@@ -1101,7 +1103,7 @@ script:
             text1: "{{states.input_text.lms_song.state | e | replace('&#39;','') | replace(' ','+')}}"
         - condition: template 
           value_template: "{{ states.input_text.lms_qry_result.state != 'null' }}"
-        - service:  media_player.squeezebox_call_method
+        - service:  squeezebox.call_method
           data_template: 
             entity_id: "media_player.{{states.input_select.lms_player.state}}"
             command: playlist
@@ -1117,7 +1119,7 @@ script:
             text3: "_{{states.input_text.lms_song.state | e | replace('&#39;','') | replace(' ','_')}}"
         - condition: template 
           value_template: "{{ states.input_text.lms_qry_result.state != 'null' }}"
-        - service:  media_player.squeezebox_call_method
+        - service:  squeezebox.call_method
           data_template: 
             entity_id: "media_player.{{states.input_select.lms_player.state}}"
             command: playlistcontrol
@@ -1136,7 +1138,7 @@ script:
             text1: "{{states.input_text.lms_song.state | e | replace('&#39;','') | replace(' ','+')}}"
         - condition: template 
           value_template: "{{ states.input_text.lms_qry_result.state != 'null' }}"
-        - service:  media_player.squeezebox_call_method
+        - service:  squeezebox.call_method
           data_template: 
             entity_id: "media_player.{{states.input_select.lms_player.state}}"
             command: playlist
@@ -1150,7 +1152,7 @@ script:
             text1: "_{{states.input_text.lms_playlist.state | e | replace('&#39;','') | replace(' ','_')}}"
         - condition: template 
           value_template: "{{ states.input_text.lms_qry_result.state != 'null' }}"
-        - service:  media_player.squeezebox_call_method
+        - service:  squeezebox.call_method
           data_template: 
             entity_id: "media_player.{{states.input_select.lms_player.state}}"
             command: playlistcontrol
@@ -1164,7 +1166,7 @@ script:
             text1: "{{states.input_text.lms_playlist.state | e | replace('&#39;','') | replace(' ','+')}}"
         - condition: template 
           value_template: "{{ states.input_text.lms_qry_result.state != 'null' }}"
-        - service:  media_player.squeezebox_call_method
+        - service:  squeezebox.call_method
           data_template: 
             entity_id: "media_player.{{states.input_select.lms_player.state}}"
             command: playlist
@@ -1178,7 +1180,7 @@ script:
             text1: "_{{states.input_text.lms_playlist.state | e | replace('&#39;','') | replace(' ','_')}}"
         - condition: template 
           value_template: "{{ states.input_text.lms_qry_result.state != 'null' }}"
-        - service:  media_player.squeezebox_call_method
+        - service:  squeezebox.call_method
           data_template: 
             entity_id: "media_player.{{states.input_select.lms_player.state}}"
             command: playlistcontrol
@@ -1192,7 +1194,7 @@ script:
             text1: "{{states.input_text.lms_playlist.state | e | replace('&#39;','') | replace(' ','+')}}"
         - condition: template 
           value_template: "{{ states.input_text.lms_qry_result.state != 'null' }}"
-        - service:  media_player.squeezebox_call_method
+        - service:  squeezebox.call_method
           data_template: 
             entity_id: "media_player.{{states.input_select.lms_player.state}}"
             command: playlist
@@ -1206,7 +1208,7 @@ script:
             text1: "_{{states.input_text.lms_artist.state | e | replace('&#39;','') | replace(' ','_')}}"
         - condition: template 
           value_template: "{{ states.input_text.lms_qry_result.state != 'null' }}"
-        - service:  media_player.squeezebox_call_method
+        - service:  squeezebox.call_method
           data_template: 
             entity_id: "media_player.{{states.input_select.lms_player.state}}"
             command: playlistcontrol
@@ -1221,7 +1223,7 @@ script:
             text1: "{{states.input_text.lms_artist.state | e | replace('&#39;','') | replace(' ','+')}}"
         - condition: template 
           value_template: "{{ states.input_text.lms_qry_result.state != 'null' }}"
-        - service:  media_player.squeezebox_call_method
+        - service:  squeezebox.call_method
           data_template: 
             entity_id: "media_player.{{states.input_select.lms_player.state}}"
             command: playlist
@@ -1235,7 +1237,7 @@ script:
             text1: "_{{states.input_text.lms_artist.state | e | replace('&#39;','') | replace(' ','_')}}"
         - condition: template 
           value_template: "{{ states.input_text.lms_qry_result.state != 'null' }}"
-        - service:  media_player.squeezebox_call_method
+        - service:  squeezebox.call_method
           data_template: 
             entity_id: "media_player.{{states.input_select.lms_player.state}}"
             command: playlistcontrol
@@ -1249,7 +1251,7 @@ script:
             text1: "{{states.input_text.lms_artist.state | e | replace('&#39;','') | replace(' ','+')}}"
         - condition: template 
           value_template: "{{ states.input_text.lms_qry_result.state != 'null' }}"
-        - service:  media_player.squeezebox_call_method
+        - service:  squeezebox.call_method
           data_template: 
             entity_id: "media_player.{{states.input_select.lms_player.state}}"
             command: playlist
@@ -1264,7 +1266,7 @@ script:
             text2: "{{states.input_text.lms_album.state | e | replace('&#39;','') | replace(' ','_')}}"
         - condition: template 
           value_template: "{{ states.input_text.lms_qry_result.state != 'null' }}"
-        - service:  media_player.squeezebox_call_method
+        - service:  squeezebox.call_method
           data_template: 
             entity_id: "media_player.{{states.input_select.lms_player.state}}"
             command: playlistcontrol
@@ -1279,7 +1281,7 @@ script:
             text2: "{{states.input_text.lms_artist.state | e | replace('&#39;','') | replace(' ','+')}}"
         - condition: template 
           value_template: "{{ states.input_text.lms_qry_result.state != 'null' }}"
-        - service:  media_player.squeezebox_call_method
+        - service:  squeezebox.call_method
           data_template: 
             entity_id: "media_player.{{states.input_select.lms_player.state}}"
             command: playlist
@@ -1294,7 +1296,7 @@ script:
             text2: "{{states.input_text.lms_album.state | e | replace('&#39;','') | replace(' ','_')}}"
         - condition: template 
           value_template: "{{ states.input_text.lms_qry_result.state != 'null' }}"
-        - service:  media_player.squeezebox_call_method
+        - service:  squeezebox.call_method
           data_template: 
             entity_id: "media_player.{{states.input_select.lms_player.state}}"
             command: playlistcontrol
@@ -1309,7 +1311,7 @@ script:
             text2: "{{states.input_text.lms_artist.state | e | replace('&#39;','') | replace(' ','+')}}"
         - condition: template 
           value_template: "{{ states.input_text.lms_qry_result.state != 'null' }}"
-        - service:  media_player.squeezebox_call_method
+        - service:  squeezebox.call_method
           data_template: 
             entity_id: "media_player.{{states.input_select.lms_player.state}}"
             command: playlist
@@ -1342,7 +1344,7 @@ script:
     lms_cmd_play_radio:
       alias:  "LMS command to play radio station"
       sequence:
-        - service:  media_player.squeezebox_call_method
+        - service:  squeezebox.call_method
           data_template:
             entity_id: "media_player.{{states.input_select.lms_player.state}}"
             command: playlist
