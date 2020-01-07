@@ -38,7 +38,7 @@ else
 fi
 echo Query is: $query
 raw_volume=${query#*volume%3A}
-raw_volume=${raw_volume%% playlist%20repeat*}
+raw_volume=${raw_volume%% *}
 raw_shuffle=${query#*shuffle%3A}
 raw_shuffle=${raw_shuffle%% playlist%20mode*}
 if [ $raw_shuffle == 0 ] 
