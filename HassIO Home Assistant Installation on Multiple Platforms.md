@@ -87,7 +87,7 @@ curl -fsSL get.docker.com | sh
 3. To install Hass.io, run the following command:
 
 ```
-curl -sL "https://raw.githubusercontent.com/home-assistant/hassio-build/master/install/hassio_install" | bash -s
+curl -sL "https://raw.githubusercontent.com/home-assistant/hassio-build/master/install/hassio_install" | bash -s -m qemux86-64
 ```
 4. Wait up to 20 minutes for the setup to complete.  You can monitor progress of the installation using the servers IP address link http://xxx.xxx.xxx.xxx:8123.  It can take 10 minutes before this link is available.
 5. Once installation completes, you will see the Home Assistant logo and be prompted for your name, username and password.  Enter these, and press **Create Account**.
